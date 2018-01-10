@@ -2,6 +2,12 @@
 
 port form [jhead](http://www.sentex.net/~mwandel/jhead/), but adding multiple thread supporting.
 
+build:
+<pre>
+ $mkdir build && cd build
+ $cmake .. && make
+</pre>
+sample:
 <pre>
 <code>
     ImageInfo_t  exifInfo;
