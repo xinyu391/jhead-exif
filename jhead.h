@@ -81,6 +81,18 @@ typedef struct{
     void * OrientationPtr[2];
     int    OrientationNumFormat[2];
 }SectionsBuf;
+typedef struct _Stream {
+  FILE* fp;
+  unsigned char* buf;
+  int size;
+  int offset;
+} _Stream;
+
+int stream_getc(_Stream* stream);
+int stream_read(void* ptr, size_t size, size_t nmemb, _Stream* stream);
+int stream_tell(_Stream* stream);
+int stream_seek(_Stream* stream, long offset, int whence);
+void stream_close(_Stream* stream);
 //--------------------------------------------------------------------------
 // This structure stores Exif header image elements in a simple manner
 // Used to store camera data as extracted from the various ways that it can be
@@ -100,29 +112,29 @@ typedef struct {
     }JfifHeader;
 
     unsigned FileSize;
-    char  CameraMake   [32];
-    char  CameraModel  [40];
-    char  DateTime     [20];
-    unsigned Height, Width;
-    int   Orientation;
-    int   IsColor;
-    int   Process;
-    int   FlashUsed;
-    float FocalLength;
-    float ExposureTime;
-    float ApertureFNumber;
-    float Distance;
-    float CCDWidth;
+    char  CameraMake   [32];  // 设备厂商
+    char  CameraModel  [40];  // 设备型号
+    char  DateTime     [20];  //拍摄时间
+    unsigned Height, Width;   //图像大小
+    int   Orientation; //图像方向
+    int   IsColor;     //
+    int   Process;  
+    int   FlashUsed; //闪光 0：无，1：开启
+    float FocalLength; //焦距
+    float ExposureTime;  //曝光时间
+    float ApertureFNumber;//光圈大小
+    float Distance;  //  聚焦深度
+    float CCDWidth;  // 
     float ExposureBias;
-    float DigitalZoomRatio;
-    int   FocalLength35mmEquiv; // Exif 2.2 tag - usually not present.
-    int   Whitebalance;
-    int   MeteringMode;
-    int   ExposureProgram;
-    int   ExposureMode;
+    float DigitalZoomRatio; //数码变焦
+    int   FocalLength35mmEquiv; // 对应35mm胶片的焦距
+    int   Whitebalance;  //白平衡
+    int   MeteringMode;  //测光模式
+    int   ExposureProgram; 
+    int   ExposureMode;  // 曝光模式
     int   ISOequivalent;
-    int   LightSource;
-    int   DistanceRange;
+    int   LightSource;   // 光源
+    int   DistanceRange; 
 
     float xResolution;
     float yResolution;
@@ -143,9 +155,9 @@ typedef struct {
     int  numDateTimeTags;
 
     int GpsInfoPresent;
-    char GpsLat[31];
-    char GpsLong[31];
-    char GpsAlt[20];
+    char GpsLat[31]; //纬度
+    char GpsLong[31]; //经度
+    char GpsAlt[20];  //
 
     int  QualityGuess;
     SectionsBuf ptr;
@@ -226,7 +238,7 @@ int EnsurePathExists(const char * FileName);
 void CatPath(char * BasePath, const char * FilePath);
 
 // Prototypes from jpgfile.c
-int ReadJpegSections (FILE * infile, ReadMode_t ReadMode, ImageInfo_t*exifInfo);
+int ReadJpegSections (_Stream *stream, ReadMode_t ReadMode, ImageInfo_t*exifInfo);
 void DiscardData(ImageInfo_t* exifInfo);
 void DiscardAllButExif(ImageInfo_t* exifInfo);
 int ReadJpegFile(const char * FileName, ReadMode_t ReadMode, ImageInfo_t* exifInfo);
@@ -247,6 +259,9 @@ void process_DHT (const uchar * Data, int length);
 // extern ImageInfo_t ImageInfo;
 extern int ShowTags;
 
+
+
+int ReadJpegBuffer(unsigned char * buf, int size, ReadMode_t ReadMode, ImageInfo_t* exifInfo);
 //--------------------------------------------------------------------------
 // JPEG markers consist of one or more 0xFF bytes, followed by a marker
 // code byte (which is not an FF).  Here are the marker codes of interest
