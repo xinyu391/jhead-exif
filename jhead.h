@@ -86,13 +86,13 @@ typedef struct _Stream {
   unsigned char* buf;
   int size;
   int offset;
-} _Stream;
+} exif_Stream;
 
-int stream_getc(_Stream* stream);
-int stream_read(void* ptr, size_t size, size_t nmemb, _Stream* stream);
-int stream_tell(_Stream* stream);
-int stream_seek(_Stream* stream, long offset, int whence);
-void stream_close(_Stream* stream);
+int exif_stream_getc(exif_Stream* stream);
+int exif_stream_read(void* ptr, size_t size, size_t nmemb, exif_Stream* stream);
+int exif_stream_tell(exif_Stream* stream);
+int exif_stream_seek(exif_Stream* stream, long offset, int whence);
+void exif_stream_close(exif_Stream* stream);
 //--------------------------------------------------------------------------
 // This structure stores Exif header image elements in a simple manner
 // Used to store camera data as extracted from the various ways that it can be
@@ -238,7 +238,7 @@ int EnsurePathExists(const char * FileName);
 void CatPath(char * BasePath, const char * FilePath);
 
 // Prototypes from jpgfile.c
-int ReadJpegSections (_Stream *stream, ReadMode_t ReadMode, ImageInfo_t*exifInfo);
+int ReadJpegSections (exif_Stream *stream, ReadMode_t ReadMode, ImageInfo_t*exifInfo);
 void DiscardData(ImageInfo_t* exifInfo);
 void DiscardAllButExif(ImageInfo_t* exifInfo);
 int ReadJpegFile(const char * FileName, ReadMode_t ReadMode, ImageInfo_t* exifInfo);

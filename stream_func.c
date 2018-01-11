@@ -4,7 +4,7 @@
 #include "jhead.h"
 
 
-int stream_getc(_Stream* stream) {
+int exif_stream_getc(exif_Stream* stream) {
   if (stream->fp) {
     return fgetc(stream->fp);
   } else {
@@ -13,7 +13,7 @@ int stream_getc(_Stream* stream) {
     return c;
   }
 }
-int stream_read(void* ptr, size_t size, size_t nmemb, _Stream* stream) {
+int exif_stream_read(void* ptr, size_t size, size_t nmemb, exif_Stream* stream) {
   if (stream->fp) {
     return fread(ptr, size, nmemb, stream->fp);
   } else {
@@ -26,14 +26,14 @@ int stream_read(void* ptr, size_t size, size_t nmemb, _Stream* stream) {
     return aviable;
   }
 }
-int stream_tell(_Stream* stream) {
+int exif_stream_tell(exif_Stream* stream) {
   if (stream->fp) {
     return ftell(stream->fp);
   } else {
     return stream->offset;
   }
 }
-int stream_seek(_Stream* stream, long offset, int mark) {
+int exif_stream_seek(exif_Stream* stream, long offset, int mark) {
   if (stream->fp) {
     return fseek(stream->fp, offset, mark);
   } else {
@@ -47,7 +47,7 @@ int stream_seek(_Stream* stream, long offset, int mark) {
   }
 }
 
-void stream_close(_Stream* stream) {
+void exif_stream_close(exif_Stream* stream) {
   if (stream->fp) {
     fclose(stream->fp);
   }

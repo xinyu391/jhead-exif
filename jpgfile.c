@@ -118,14 +118,14 @@ static void CheckSectionsAllocated(ImageInfo_t* exifInfo)
 //--------------------------------------------------------------------------
 // Parse the marker stream until SOS or EOI is seen;
 //--------------------------------------------------------------------------
-int ReadJpegSections (_Stream * stream, ReadMode_t ReadMode, ImageInfo_t*exifInfo)
+int ReadJpegSections (exif_Stream * stream, ReadMode_t ReadMode, ImageInfo_t*exifInfo)
 {
     int a;
     int HaveCom = FALSE;
 
-    a = stream_getc(stream);
+    a = exif_stream_getc(stream);
 
-    if (a != 0xff || stream_getc(stream) != M_SOI){
+    if (a != 0xff || exif_stream_getc(stream) != M_SOI){
         return FALSE;
     }
 
@@ -143,7 +143,7 @@ int ReadJpegSections (_Stream * stream, ReadMode_t ReadMode, ImageInfo_t*exifInf
 
         prev = 0;
         for (a=0;;a++){
-            marker = stream_getc(stream);
+            marker = exif_stream_getc(stream);
             if (marker != 0xff && prev == 0xff) break;
             if (marker == EOF){
                 ErrFatal("Unexpected end of file");
@@ -158,8 +158,8 @@ int ReadJpegSections (_Stream * stream, ReadMode_t ReadMode, ImageInfo_t*exifInf
         exifInfo->ptr.Sections[exifInfo->ptr.SectionsRead].Type = marker;
   
         // Read the length of the section.
-        lh = stream_getc(stream);
-        ll = stream_getc(stream);
+        lh = exif_stream_getc(stream);
+        ll = exif_stream_getc(stream);
         if (lh == EOF || ll == EOF){
             ErrFatal("Unexpected end of file");
         }
@@ -182,7 +182,7 @@ int ReadJpegSections (_Stream * stream, ReadMode_t ReadMode, ImageInfo_t*exifInf
         Data[0] = (uchar)lh;
         Data[1] = (uchar)ll;
 
-        got = stream_read(Data+2, 1, itemlen-2, stream); // Read the whole section.
+        got = exif_stream_read(Data+2, 1, itemlen-2, stream); // Read the whole section.
         if (got != itemlen-2){
             ErrFatal("Premature end of file?");
         }
@@ -195,10 +195,10 @@ int ReadJpegSections (_Stream * stream, ReadMode_t ReadMode, ImageInfo_t*exifInf
                 if (ReadMode & READ_IMAGE){
                     int cp, ep, size;
                     // Determine how much file is left.
-                    cp = stream_tell(stream);
-                    stream_seek(stream, 0, SEEK_END);
-                    ep = stream_tell(stream);
-                    stream_seek(stream, cp, SEEK_SET);
+                    cp = exif_stream_tell(stream);
+                    exif_stream_seek(stream, 0, SEEK_END);
+                    ep = exif_stream_tell(stream);
+                    exif_stream_seek(stream, cp, SEEK_SET);
 
                     size = ep-cp;
                     Data = (uchar *)malloc(size);
@@ -206,7 +206,7 @@ int ReadJpegSections (_Stream * stream, ReadMode_t ReadMode, ImageInfo_t*exifInf
                         ErrFatal("could not allocate data for entire image");
                     }
 
-                    got = stream_read(Data, 1, size, stream);
+                    got = exif_stream_read(Data, 1, size, stream);
                     if (got != size){
                         ErrFatal("could not read the rest of the image");
                     }
@@ -373,7 +373,7 @@ int ReadJpegBuffer(unsigned char * buf, int size, ReadMode_t ReadMode, ImageInfo
         return FALSE;
     }
 
-    _Stream stream;
+    exif_Stream stream;
     stream.fp = NULL;
     stream.buf = buf;
     stream.size = size;
@@ -447,7 +447,7 @@ int ReadJpegFile(const char * FileName, ReadMode_t ReadMode, ImageInfo_t* exifIn
     strncpy(exifInfo->FileName, FileName, PATH_MAX);
     //****************File Info********************************//
 
-    _Stream stream;
+    exif_Stream stream;
     stream.fp = infile;
     ResetJpgfile(exifInfo);
     // Scan the JPEG headers.
